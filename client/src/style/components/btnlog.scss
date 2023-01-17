@@ -1,0 +1,33 @@
+.container-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 400px;
+    border-radius: 25px;
+    background-color: rgb(224, 246, 254);
+    margin-left: 743px;
+    margin-top: 12px;
+  }
+  
+  .buttons {
+    width: 90px;
+    height: 40px;
+    padding: 8px;
+    font-size: 0.7rem;
+    background-color: rgb(224, 246, 254);
+    color: rgb(29, 43, 165);
+    margin: 15px;
+    font-size: larger;
+    border-radius: 5px;
+  
+    cursor: pointer;
+  
+    &:hover {
+     filter: brightness(110%);
+    color:rgb(224, 246, 254);
+    background-color: rgb(29, 43, 165); 
+    }
+  }
+  .sign-up {
+    margin-left: 20px;
+  }
