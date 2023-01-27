@@ -3,13 +3,14 @@ const app = express();
 require("dotenv").config({ path: "./config/.env" });
 const mongoose = require("mongoose");
 const morgan = require("morgan");
-const cookieParser=require('cookie-parser');
 const cors = require("cors");
 const routes = require("./routes/index");
 const cookieParser = require("cookie-parser");
-const { checkUser } = require("./middleware/auth.middleware");
+const { checkUser, requireAuth } = require("./middleware/auth.middleware");
 
 const PORT = 3000;
+
+
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/DB", {
@@ -21,15 +22,19 @@ mongoose
 
 app.use(morgan("dev"));
 app.use(cors());
-app.use(cookieParser())
+app.use(cookieParser());
 
 app.use(express.json());
 
 //jwt
-app.get('*',checkUser)
+
+app.get("*", checkUser);
+app.get("/jwtid", requireAuth, (req, res) => {
+  res.status(200).send(res.locals.user._id);
+});
+
 app.use("/api", routes);
 
 app.listen(PORT, () => {
   console.log(`Listening on port : ` + PORT);
 });
-

@@ -34,6 +34,7 @@ const userSchema = new Schema(
       max: 1024, //vu que le password est cryptee ca peut etre long
       minlength: 6,
     },
+   
   },
   {
     timestamps: true, //pour la date de creation automatique

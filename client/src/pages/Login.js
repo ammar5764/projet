@@ -1,10 +1,52 @@
+import { useState } from "react";
 import { Col, Button, Row, Container, Card, Form } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
 import Navigations from "../component/Navigations";
+import { login } from "../services/authUsers";
+
 
 export default function Login() {
+  const [state, setState] = useState({
+    email: "",
+    password: "",
+  });
+  const navigate=useNavigate()
+
+  const redirectToLenders = () => {
+    navigate("/profile", { replace: true });
+  };
+  const sendLoginToServer = async () => {
+    if(state.email.length && state.password.length) {
+      const result = await login(state.email,state.password);
+      if(result.status === 200){
+        console.log("token",)
+        localStorage.token = result.data.token;
+        
+        redirectToLenders();
+      }
+      else{
+        setMessage('error'); 
+      }
+    }
+    else
+    {
+      setMessage('please enter valid userName and password')   
+    } 
+  }
+  
+  
+
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setState((prevUser) => ({
+      ...prevUser,
+      [id]: value,
+    }));
+  };
   return (
     <div>
-      <Navigations/>
+      <Navigations />
       <Container>
         <Row className="vh-100 d-flex justify-content-center align-items-center">
           <Col md={8} lg={6} xs={12}>
@@ -20,7 +62,12 @@ export default function Login() {
                         <Form.Label className="text-center">
                           Email address
                         </Form.Label>
-                        <Form.Control type="email" placeholder="Enter email" />
+                        <Form.Control
+                          type="email"
+                          id="email"
+                          placeholder="Enter email"
+                          onChange={handleChange}
+                        />
                       </Form.Group>
 
                       <Form.Group
@@ -28,7 +75,12 @@ export default function Login() {
                         controlId="formBasicPassword"
                       >
                         <Form.Label>Password</Form.Label>
-                        <Form.Control type="password" placeholder="Password" />
+                        <Form.Control
+                          type="password"
+                          id="password"
+                          placeholder="Password"
+                          onChange={handleChange}
+                        />
                       </Form.Group>
                       <Form.Group
                         className="mb-3"
@@ -41,7 +93,7 @@ export default function Login() {
                         </p>
                       </Form.Group>
                       <div className="d-grid">
-                        <Button variant="primary" type="submit">
+                        <Button variant="primary" type="submit" onClick={sendLoginToServer}>
                           Login
                         </Button>
                       </div>
@@ -49,9 +101,9 @@ export default function Login() {
                     <div className="mt-3">
                       <p className="mb-0  text-center">
                         Don't have an account?{" "}
-                        <a href="{''}" className="text-primary fw-bold">
+                        <Link to='/register' className="text-primary fw-bold">
                           Sign Up
-                        </a>
+                        </Link>
                       </p>
                     </div>
                   </div>
@@ -64,3 +116,4 @@ export default function Login() {
     </div>
   );
 }
+
