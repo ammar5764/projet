@@ -1,23 +1,22 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/users");
+const { signUpErrors,signInErrors } = require("../utils/error.utils");
 
 exports.signUp = async (req, res) => {
   const { name, username, email, password } = req.body;
-  const user = await User.findOne({ username });
-  if (user) {
-    res.status(401).json({ error: "ce mail est deja utilises" });
-  } else {
+ 
+ 
     try {
       const user = await User.create({ name, username, email, password });
       //user.save();
       res.status(201).send({ user: user });
     } catch (err) {
-      console.log(err);
+      const errors = signUpErrors(err)
 
-      res.status(200).send({ err });
+      res.status(200).send({ errors });
     }
-  }
+  
 };
 
 exports.signIn = async (req, res) => {
@@ -28,7 +27,10 @@ exports.signIn = async (req, res) => {
     const token = createToken(user._id);
     res.cookie("jwt", token, { httpOnly: true, maxAge });
     res.status(200).json({ user: user._id });
-  } catch (error) { }
+  } catch (err) {
+    const errors = signInErrors(err);
+    res.status(200).send({ errors });
+   }
 };
 
 const maxAge = 3 * 24 * 60 * 60 * 1000; //3 ici correspond au nombre de jours
