@@ -34,7 +34,23 @@ const userSchema = new Schema(
       max: 1024, //vu que le password est cryptee ca peut etre long
       minlength: 6,
     },
-   
+    picture: {
+      type: String,
+      default: '../../client/public/uploads/profil/random-user.png'
+    },
+    bio: {
+      type: String,
+      max: 1024,
+    },
+      followers: {
+        type: [String],
+      },
+      following:{
+        type:[String]
+      },
+      likes: {
+        type: [String]
+      }
   },
   {
     timestamps: true, //pour la date de creation automatique

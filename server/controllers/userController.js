@@ -1,76 +1,132 @@
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+
 const User = require("../models/users");
 
-exports.signUp = async (req, res) => {
-  const { name, username, email, password } = req.body;
-  console.log(req.body);
-  const user = await User.findOne({ username });
-  if (user) {
-    res.status(401).json({ error: "ce mail est deja utilises" });
-  } else {
-    try {
-      const user = await User.create({ name, username, email, password });
-      //user.save();
-      res.status(201).send({ user: user });
-    } catch (err) {
-      console.log(err);
-
-      res.status(200).send({ err });
-    }
+exports.getUsers = async (req, res) => {
+  try {
+    const users = await User.find().select('-password');
+    res.status(200).send(users);
+  } catch (error) {
+    res.status(404).send({ error });
   }
 };
 
-exports.signIn = async (req, res) => {
-  const { email, password } = req.body;
+
+exports.getOneUser = async (req, res) => {
   try {
-    const user = await User.login(email, password);
-    //creation token lors d'un login
-    const token = createToken(user._id);
-    res.cookie("jwt", token, { httpOnly: true, maxAge });
-    res.status(200).json({ user: user._id });
-  } catch (error) {}
+    const id = req.params.id;
+    var user = await User.findOne({ _id: id }).select('-password')
+    res.status(200).send(user)
+  } catch (error) {
+    res.status(404).json({ 'id inconnu :': error })
+  }
 };
 
-const maxAge = 3 * 24 * 60 * 60 * 1000; //3 ici correspond au nombre de jours
+exports.updateUser = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const body = req.body;
+    var user = await User.findOneAndUpdate(
+      { _id: id },
+      {
+        $set: { ...body }
+      },
 
-const createToken = (id) => {
-  return jwt.sign({ id }, process.env.TOKEN_SECRET, {
-    expiresIn: maxAge,
-  });
-};
+      (err, docs) => {
+        if (!err) return res.send(docs);
+        if (err) return res.status(500).send({ meassge: err })
+      }
+    ).select('-password');
+    res.status(200).send(user)
+  } catch (error) {
+    return res.status(400).json({ message: error })
+  }
 
-exports.logOut = (req, res) => {
-  res.cookie("jwt", "", { maxAge: 1 });
-  res.redirect("/");
-};
+}
 
-// exports.signIn=async(req,res)=>{
-//   const {email,password} = req.body;
 
-//     const user = await User.findOne({ email})
-//     if(!user)
-//     {
-//       res.status(401).json({ error: 'email doesnt exist' });
-//     }else{
-//       //decrypt password
-//       bcrypt.compare(password, user.password)
-//       .then(valid => {
-//         if (!valid) {
-//           console.log(valid);
-//           res.status(401).json({ error: 'wrong password' });
-//         }else{
-//           console.log(valid);
-//           res.status(200).json({
-//             token: jwt.sign(
-//               { userId: user._id },
-//               'RANDOM_TOKEN_SECRET',
-//               { expiresIn: '24h'}
-//             ),
-//             message: 'connexion successful.'
-//           });
+// exports.updateUser = async (req, res) => {
+//   try {
+//     await User.findByIdAndUpdate(
+//       { _id: req.params.id },
+//       {
+//         $set: {
+//           bio: req.body.bio
 //         }
-//       })
-//       .catch(error => res.status(500).json({ error }));
-//     }
-//   };
+//       },
+//       { new: true, upsert: true, setDefaultsOnInsert: true },
+//       (err, docs) => {
+//         if (!err) return res.send(docs)
+//         if (err) return res.status(500).send({ message: err })
+//       }
+//     )
+//   } catch (err) {
+//     return res.status(400).json({ message: err })
+//   }
+
+// }
+
+exports.deleteUser = async (req, res) => {
+  try {
+    await User.remove({
+      _id: req.params.id
+    }).exec(),
+      res.status(200).json({ message: 'successfully deleted' })
+  } catch (error) {
+    return res.status(400).json({ message: error })
+  }
+};
+
+
+exports.follow = async (req, res) => {
+  try {
+    //add to the follower list:
+    await User.findByIdAndUpdate(
+      req.params.id,//id du suiveur et dans son objet on met:
+      { $addToSet: { following: req.body.idToFollow } }, //id de celui qui est suivi
+      { new: true, upsert: true},
+      (err, docs) => {
+        if (!err) res.status(201).json(docs)
+        else return res.status(400).json( err)
+      }
+    );
+    //add to following list :
+    await User.findByIdAndUpdate(
+      req.body.idToFollow,//celui qui est suivi
+      { $addToSet: { followers: req.params.id } },//id du suiveur
+      { new: true, upsert: true },
+      (err, docs) => {
+        //  if (!err) res.status(201).json(docs) on peut pas mettre deux res status(l.87)
+        if (err) return res.status(400).json(err)
+      }
+    )
+
+  } catch (error) {
+    return res.status(400).json({ message: error })
+  }
+}
+
+exports.unFollow = async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(
+      req.params.id,//id du suiveur et dans son objet on met:
+      { $pull: { following: req.body.idToUnFollow } }, //id de celui qui est suivi
+      { new: true, upsert: true},
+      (err, docs) => {
+        if (!err) res.status(201).json(docs)
+        else return res.status(400).json( err)
+      }
+    );
+    //add to following list :
+    await User.findByIdAndUpdate(
+      req.body.idToUnFollow,//celui qui est suivi
+      { $pull: { followers: req.params.id } },//id du suiveur
+      { new: true, upsert: true },
+      (err, docs) => {
+        //  if (!err) res.status(201).json(docs) on peut pas mettre deux res status(l.87)
+        if (err) return res.status(400).json(err)
+      }
+    )
+  } catch (error) {
+    return res.status(400).json({ message: error })
+  }
+}
