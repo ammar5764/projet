@@ -11,8 +11,8 @@ const userSchema = new Schema(
       maxlength: 55,
       trim: true,
     },
-    date: {
-      type: Date,
+    modele: {
+      type: String,
     },
     languages: {
       type: Array,

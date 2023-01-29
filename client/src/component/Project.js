@@ -48,7 +48,7 @@ const Project = (props) => {
     <div className="project-main">
       <div className="project-content">
         <h1>{data.title}</h1>
-        <p>{data.date}</p>
+        <p>{data.modele}</p>
         {/* <ul className='languages'>
                     {data.languages.map((item) => (
                     <li key={item}>{item}</li>))}

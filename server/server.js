@@ -10,8 +10,6 @@ const { checkUser, requireAuth } = require("./middleware/auth.middleware");
 
 const PORT = 3000;
 
-
-
 mongoose
   .connect("mongodb://127.0.0.1:27017/DB", {
     useNewUrlParser: true,
@@ -25,6 +23,18 @@ app.use(cors());
 app.use(cookieParser());
 
 app.use(express.json());
+
+//cors
+const corsOptions = {
+  origin: process.env.CLIENT_URL,
+  credentials: true,
+  'allowedHeaders': ["sessionId", 'Content-Type'],
+  'exposedHeaders': ["sessionId"],
+  'methods': "GET,HEAD,PUT,PATCH,POST,DELETE",
+  'preflightContinue': false,
+};
+
+app.use(cors({corsOptions}));
 
 //jwt
 
