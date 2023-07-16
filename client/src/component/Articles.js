@@ -1,11 +1,17 @@
 import axios from "axios";
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+
 
 const Article = ({ articles }) => {
+  
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState("");
 
+  //  get/id---------------------------------------
+
+ 
   //-----put (modifier et poster des donnees)---------------------
   const handleEdit = () => {
     const data = {
@@ -36,42 +42,44 @@ const Article = ({ articles }) => {
     return newDate;
   };
   return (
-    <div
-      className="article"
-      style={{ background: isEditing ? "#f3feff" : "white" }}
-    >
-      <div className="card-header">
-        <h3>{articles.author}</h3>
-        <em>poste le {dateFormater(articles.date)}</em>
-      </div>
-      {isEditing ? (
-        <textarea
-          defaultValue={editContent ? editContent : articles.content}
-          autoFocus
-          onChange={(e) => setEditContent(e.target.value)}
-        ></textarea>
-      ) : (
-        <p>{editContent ? editContent : articles.content}</p>
-      )}
-
-      <div className="btn-container">
+  
+      <div
+        className="article"
+        style={{ background: isEditing ? "#f3feff" : "white" }}
+      >
+        <div className="card-header">
+          <h3>{articles.author}</h3>
+          <em>poste le {dateFormater(articles.date)}</em>
+        </div>
         {isEditing ? (
-          <button onClick={() => handleEdit()}>valider</button>
+          <textarea
+            defaultValue={editContent ? editContent : articles.content}
+            autoFocus
+            onChange={(e) => setEditContent(e.target.value)}
+          ></textarea>
         ) : (
-          <button onClick={() => setIsEditing(true)}>Edit</button>
+          <p>{editContent ? editContent : articles.content}</p>
         )}
 
-        <button
-          onClick={() => {
-            if (window.confirm("voulez vous vraiment effacer ce message?")) {
-              handleDelete();
-            }
-          }}
-        >
-          Supprimer
-        </button>
+        <div className="btn-container">
+          {isEditing ? (
+            <button onClick={() => handleEdit()}>valider</button>
+          ) : (
+            <button onClick={() => setIsEditing(true)}>Edit</button>
+          )}
+
+          <button
+            onClick={() => {
+              if (window.confirm("voulez vous vraiment effacer ce message?")) {
+                handleDelete();
+              }
+            }}
+          >
+            Supprimer
+          </button>
+        </div>
       </div>
-    </div>
+    
   );
 };
 

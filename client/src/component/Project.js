@@ -7,8 +7,8 @@
 //             <div className="project-content">
 //                 <h1>{props.baseData.title}</h1>
 //                 <p>{props.baseData.date}</p>
-//                 {/* <ul className='languages'>
-//                 {props.baseData.languages[0].map((item)=>(
+//                 {/* <ul className='choix'>
+//                 {props.baseData.choix[0].map((item)=>(
 //                      <li key={item}>{item}</li>
 //                      )) }
 //                 </ul> */}
@@ -33,24 +33,28 @@ const Project = (props) => {
   const getData = async () => {                        
     const response = await axios.get("http://localhost:3000/api/projets"); //rend un array avec 4 objets a l'interieur
     console.log("response", response);
-    var res = response.data[props.number]; //rend le premier objet
+    var res = response.data[props.number];
+    console.log("res",res); //rend le premier objet
     //  var cloneData = [...data, res];//rend un array avec l'objet a l'interieur [{}]
     // console.log("clonedata", cloneData);
-    setData(res);
+    setData(res);//setData(res)
   };
   useEffect(() => {
+    
     setLeft(Math.floor(Math.random() * 200 + 700) + "px");
     setTop(Math.floor(Math.random() * 200 + 150) + "px");
     setSize("scale(" + (Math.random() + 0.7) + ")");
+
     getData();
   }, []);
+
   return (
     <div className="project-main">
       <div className="project-content">
         <h1>{data.title}</h1>
         <p>{data.modele}</p>
-        {/* <ul className='languages'>
-                    {data.languages.map((item) => (
+        {/* <ul >
+                    {data.choix.map((item) => (
                     <li key={item}>{item}</li>))}
                 </ul> */}
       </div>
@@ -80,5 +84,5 @@ const Project = (props) => {
     </div>
   );
 };
-//lorsque on fait un map il y a trois possibilitees: 1) evec des accolades dans ce cas  il faut mettre un return .2) on ne met pas d'accolades dans ce cas on ecrit sur la meme ligne     .map((item)=><li></li> sans le return) .3)  on va a la ligne sans accolade il faut des parentheses qui font office de return
+//lorsque on fait un map il y a trois possibilitees: 1) avec des accolades dans ce cas  il faut mettre un return .2) on ne met pas d'accolades dans ce cas on ecrit sur la meme ligne     .map((item)=><li></li> sans le return) .3)  on va a la ligne sans accolade il faut des parentheses qui font office de return
 export default Project;

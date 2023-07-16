@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";//Navigate
+import { Link, useNavigate } from "react-router-dom"; //Navigate
 import { Col, Button, Row, Container, Card, Form } from "react-bootstrap";
 import { createUser } from "../services/authUsers";
 import Navigations from "../component/Navigations";
@@ -11,17 +11,16 @@ const Register = () => {
     email: "",
     password: "",
   });
-  let navigate = useNavigate();//<Navigate to='login'/>
+  let navigate = useNavigate(); //<Navigate to='login'/>
   const [message, setMessage] = useState("");
-  // useEffect(() => {
 
-  // }, []);
 
   const redirectToLenders = () => {
     navigate("/login", { replace: true });
   };
 
-  const sendToServer = async () => {
+  const sendToServer = async (e) => {
+    e.preventDefault();
     if (
       state.name.length &&
       state.username.length &&
@@ -69,7 +68,7 @@ const Register = () => {
                     Register
                   </h2>
                   <div className="mb-3">
-                    <Form>
+                    <Form onSubmit={(e) => sendToServer(e)}>
                       <Form.Group className="mb-3">
                         <Form.Label className="text-center">Name</Form.Label>
                         <Form.Control
@@ -113,13 +112,18 @@ const Register = () => {
                           placeholder="Password"
                         />
                       </Form.Group>
+                      {/* <Form.Group className="mb-3">
+                        <Form.Label>confirm Password</Form.Label>
+                        <Form.Control
+                          type="password"
+                          id="password-conf"
+                          onChange={handleChange}
+                          placeholder="Password"
+                        />
+                      </Form.Group> */}
 
                       <div className="d-grid">
-                        <Button
-                          variant="primary"
-                          type="submit"
-                          onClick={sendToServer}
-                        >
+                        <Button variant="primary" type="submit">
                           Create Account
                         </Button>
                       </div>
