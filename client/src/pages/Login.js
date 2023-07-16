@@ -3,39 +3,44 @@ import { Col, Button, Row, Container, Card, Form } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import Navigations from "../component/Navigations";
 import { login } from "../services/authUsers";
-
+// import { useForm } from "react-hook-form";
 
 export default function Login() {
   const [state, setState] = useState({
     email: "",
     password: "",
   });
-  const navigate=useNavigate()
+  const navigate = useNavigate();
 
-  const redirectToLenders = () => {
-    navigate("/profile", { replace: true });
+  // const { register, handleSubmit, watch, formState: { errors } } = useForm({
+  //   mode: 'onBlur',
+  // });
+
+
+  const redirectToProfil = () => {
+    navigate("/cv");
   };
-  const sendLoginToServer = async () => {
-    if(state.email.length && state.password.length) {
-      const result = await login(state.email,state.password);
-      if(result.status === 200){
-        console.log("token",)
-        localStorage.token = result.data.token;
-        
-        redirectToLenders();
-      }
-      else{
-        setMessage('error'); 
-      }
-    }
-    else
-    {
-      setMessage('please enter valid userName and password')   
-    } 
-  }
-  
-  
+  const sendLoginToServer = async (e) => {
+    e.preventDefault();
+    const emailError = document.querySelector(".email.error");
+    const passwordError = document.querySelector(".password.error");
+    if (state.email.length && state.password.length) {
+      const result = await login(state.email, state.password)
+      .then((res) => {
+        console.log('token',res.data.token);
+        if (res.data.errors) {
+          emailError.innerHTML = res.data.errors.email;
+          passwordError.innerHTML = res.data.errors.password;
+        } else {
+          localStorage.setItem("tokenjwt",res.data.token)
 
+          redirectToProfil();
+        }
+      }).catch((err)=>{
+        console.log(err);
+      })
+    }
+  };
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -57,8 +62,10 @@ export default function Login() {
                   <h2 className="fw-bold mb-2 text-uppercase ">Welcome</h2>
                   <p className=" mb-5">Please enter your login and password!</p>
                   <div className="mb-3">
-                    <Form>
-                      <Form.Group className="mb-3" controlId="formBasicEmail">
+
+                  {/* <form onSubmit={handleSubmit(onSubmit)}> */}
+                    <Form onSubmit={(e) => sendLoginToServer(e)}>  
+                      <Form.Group className="mb-3">
                         <Form.Label className="text-center">
                           Email address
                         </Form.Label>
@@ -67,13 +74,13 @@ export default function Login() {
                           id="email"
                           placeholder="Enter email"
                           onChange={handleChange}
+                          // {...register("exampleRequired", { required: true })}
                         />
+                             {/* {errors.exampleRequired && <span style={{color:"red"}}>This field is required</span>} */}
                       </Form.Group>
-
-                      <Form.Group
-                        className="mb-3"
-                        controlId="formBasicPassword"
-                      >
+                      <div className="email error"></div>
+                      <br />
+                      <Form.Group className="mb-3">
                         <Form.Label>Password</Form.Label>
                         <Form.Control
                           type="password"
@@ -82,6 +89,8 @@ export default function Login() {
                           onChange={handleChange}
                         />
                       </Form.Group>
+                      <div className="password error"></div>
+                      <br />
                       <Form.Group
                         className="mb-3"
                         controlId="formBasicCheckbox"
@@ -93,7 +102,7 @@ export default function Login() {
                         </p>
                       </Form.Group>
                       <div className="d-grid">
-                        <Button variant="primary" type="submit" onClick={sendLoginToServer}>
+                        <Button variant="primary" type="submit">
                           Login
                         </Button>
                       </div>
@@ -101,7 +110,7 @@ export default function Login() {
                     <div className="mt-3">
                       <p className="mb-0  text-center">
                         Don't have an account?{" "}
-                        <Link to='/register' className="text-primary fw-bold">
+                        <Link to="/register" className="text-primary fw-bold">
                           Sign Up
                         </Link>
                       </p>
@@ -116,4 +125,3 @@ export default function Login() {
     </div>
   );
 }
-
