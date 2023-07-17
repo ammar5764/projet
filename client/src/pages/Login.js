@@ -12,33 +12,31 @@ export default function Login() {
   });
   const navigate = useNavigate();
 
-  // const { register, handleSubmit, watch, formState: { errors } } = useForm({
-  //   mode: 'onBlur',
-  // });
-
-
   const redirectToProfil = () => {
-    navigate("/cv");
+    navigate("/profile");
   };
+
   const sendLoginToServer = async (e) => {
     e.preventDefault();
     const emailError = document.querySelector(".email.error");
     const passwordError = document.querySelector(".password.error");
     if (state.email.length && state.password.length) {
       const result = await login(state.email, state.password)
-      .then((res) => {
-        console.log('token',res.data.token);
-        if (res.data.errors) {
-          emailError.innerHTML = res.data.errors.email;
-          passwordError.innerHTML = res.data.errors.password;
-        } else {
-          localStorage.setItem("tokenjwt",res.data.token)
+        .then((res) => {
+         
+          console.log("data", res.data);
+          if (res.data.errors) {
+            emailError.innerHTML = res.data.errors.email;
+            passwordError.innerHTML = res.data.errors.password;
+          } else {
+            localStorage.setItem("tokenjwt", res.data.token);
 
-          redirectToProfil();
-        }
-      }).catch((err)=>{
-        console.log(err);
-      })
+            redirectToProfil();
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
   };
 
@@ -62,9 +60,8 @@ export default function Login() {
                   <h2 className="fw-bold mb-2 text-uppercase ">Welcome</h2>
                   <p className=" mb-5">Please enter your login and password!</p>
                   <div className="mb-3">
-
-                  {/* <form onSubmit={handleSubmit(onSubmit)}> */}
-                    <Form onSubmit={(e) => sendLoginToServer(e)}>  
+                    {/* <form onSubmit={handleSubmit(onSubmit)}> */}
+                    <Form onSubmit={(e) => sendLoginToServer(e)}>
                       <Form.Group className="mb-3">
                         <Form.Label className="text-center">
                           Email address
@@ -76,7 +73,7 @@ export default function Login() {
                           onChange={handleChange}
                           // {...register("exampleRequired", { required: true })}
                         />
-                             {/* {errors.exampleRequired && <span style={{color:"red"}}>This field is required</span>} */}
+                        {/* {errors.exampleRequired && <span style={{color:"red"}}>This field is required</span>} */}
                       </Form.Group>
                       <div className="email error"></div>
                       <br />

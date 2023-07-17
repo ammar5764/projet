@@ -65,18 +65,7 @@ userSchema.pre("save", async function (next) {
   next(); //une fois le password saler alors next() cad passe a l'autre function
 });
 
-//desalage password
-userSchema.statics.login = async function (email, password) {
-  const user = await this.findOne({ email });
-  if (user) {
-    const auth = await bcrypt.compare(password, user.password);
-    if (auth) {
-      return user;
-    }
-    throw Error("incorrect password");
-  }
-  throw Error("incorrect email");
-};
+
 
 const User = mongoose.model("User", userSchema); //c'est le mot User+s qui sera ajoute a la base de donnees
 
